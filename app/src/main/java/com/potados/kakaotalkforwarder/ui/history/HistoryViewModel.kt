@@ -24,6 +24,8 @@ class HistoryViewModel(
         viewModelScope.launch { forwardingRepository.retry(id) }
     }
 
+    suspend fun clearAll() = forwardingRepository.clearAll()
+
     companion object {
         fun factory(context: Context) = viewModelFactory {
             initializer { HistoryViewModel(context.app.forwardingRepository) }

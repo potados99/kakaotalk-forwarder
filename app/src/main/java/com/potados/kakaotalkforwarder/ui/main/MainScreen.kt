@@ -21,8 +21,8 @@ import com.potados.kakaotalkforwarder.ui.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
 private enum class HomeTab(val titleRes: Int) {
-    Settings(R.string.tab_settings),
     History(R.string.tab_history),
+    Settings(R.string.tab_settings),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

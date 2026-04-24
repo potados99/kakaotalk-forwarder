@@ -1,23 +1,19 @@
 package com.potados.kakaotalkforwarder.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -32,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -54,6 +51,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -68,26 +66,23 @@ fun SettingsScreen(
     var token by rememberSaveable(settings.bearerToken) { mutableStateOf(settings.bearerToken) }
     var nickname by rememberSaveable(settings.filterNickname) { mutableStateOf(settings.filterNickname) }
     var showToken by rememberSaveable { mutableStateOf(false) }
-    var showClearConfirm by rememberSaveable { mutableStateOf(false) }
 
     val savedLabel = stringResource(R.string.settings_saved)
-    val clearedLabel = stringResource(R.string.history_clear_all)
 
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
+    Box(modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .padding(padding)
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = 16.dp, vertical = 20.dp)
+                .padding(bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            PermissionCard(
-                isEnabled = isPermissionEnabled,
-                onOpenSettings = { NotificationPermission.openListenerSettings(context) },
-            )
+            if (!isPermissionEnabled) {
+                PermissionCard(
+                    onOpenSettings = { NotificationPermission.openListenerSettings(context) },
+                )
+            }
 
             OutlinedTextField(
                 value = apiUrl,
@@ -124,64 +119,37 @@ fun SettingsScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
-
-            Button(
-                onClick = {
-                    scope.launch {
-                        viewModel.save(apiUrl, token, nickname)
-                        snackbarHostState.showSnackbar(savedLabel)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.settings_save))
-            }
-
-            Spacer(Modifier.height(8.dp))
-            HorizontalDivider()
-
-            OutlinedButton(
-                onClick = { showClearConfirm = true },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.history_clear_all))
-            }
         }
 
-        if (showClearConfirm) {
-            AlertDialog(
-                onDismissRequest = { showClearConfirm = false },
-                title = { Text(stringResource(R.string.history_clear_confirm_title)) },
-                text = { Text(stringResource(R.string.history_clear_confirm_message)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showClearConfirm = false
-                        scope.launch {
-                            viewModel.clearHistory()
-                            snackbarHostState.showSnackbar(clearedLabel)
-                        }
-                    }) { Text(stringResource(R.string.common_confirm)) }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showClearConfirm = false }) {
-                        Text(stringResource(R.string.common_cancel))
-                    }
-                },
-            )
+        Button(
+            onClick = {
+                focusManager.clearFocus()
+                scope.launch {
+                    viewModel.save(apiUrl, token, nickname)
+                    snackbarHostState.showSnackbar(savedLabel)
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+        ) {
+            Text(stringResource(R.string.settings_save))
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 72.dp),
+        )
     }
 }
 
 @Composable
-private fun PermissionCard(isEnabled: Boolean, onOpenSettings: () -> Unit) {
+private fun PermissionCard(onOpenSettings: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = if (isEnabled) {
-                MaterialTheme.colorScheme.secondaryContainer
-            } else {
-                MaterialTheme.colorScheme.errorContainer
-            }
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
@@ -193,33 +161,19 @@ private fun PermissionCard(isEnabled: Boolean, onOpenSettings: () -> Unit) {
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = stringResource(
-                    if (isEnabled) R.string.permission_granted else R.string.permission_denied
-                ),
+                text = stringResource(R.string.permission_denied),
                 style = MaterialTheme.typography.bodyLarge,
             )
-            if (!isEnabled) {
-                Text(
-                    text = stringResource(R.string.permission_description),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Button(onClick = onOpenSettings) {
-                        Text(stringResource(R.string.permission_open_settings))
-                    }
-                }
-            } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    TextButton(onClick = onOpenSettings) {
-                        Text(stringResource(R.string.permission_open_settings))
-                    }
+            Text(
+                text = stringResource(R.string.permission_description),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Button(onClick = onOpenSettings) {
+                    Text(stringResource(R.string.permission_open_settings))
                 }
             }
         }
