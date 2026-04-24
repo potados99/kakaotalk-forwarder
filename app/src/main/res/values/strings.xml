@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">KakaoTalk Forwarder</string>
+    <string name="notification_listener_label">카카오톡 포워더</string>
+
+    <!-- Tabs -->
+    <string name="tab_settings">설정</string>
+    <string name="tab_history">이력</string>
+
+    <!-- Settings -->
+    <string name="settings_api_url">API 엔드포인트 URL</string>
+    <string name="settings_api_url_hint">https://example.com/api/menuPosts</string>
+    <string name="settings_bearer_token">Bearer 토큰</string>
+    <string name="settings_filter_nickname">감지할 발신자 이름</string>
+    <string name="settings_filter_nickname_default">진한식당m</string>
+    <string name="settings_save">저장</string>
+    <string name="settings_saved">저장됨</string>
+    <string name="settings_show_token">토큰 표시</string>
+    <string name="settings_hide_token">토큰 숨김</string>
+
+    <string name="permission_title">알림 접근 권한</string>
+    <string name="permission_granted">허용됨</string>
+    <string name="permission_denied">미허용</string>
+    <string name="permission_open_settings">시스템 설정 열기</string>
+    <string name="permission_description">카카오톡 알림을 감지하려면 이 권한이 필요합니다.</string>
+
+    <string name="history_clear_all">이력 전체 삭제</string>
+    <string name="history_clear_confirm_title">이력을 전부 지울까요?</string>
+    <string name="history_clear_confirm_message">이 동작은 되돌릴 수 없습니다.</string>
+    <string name="common_cancel">취소</string>
+    <string name="common_confirm">확인</string>
+
+    <!-- History -->
+    <string name="history_empty">아직 전달된 메시지가 없습니다.</string>
+    <string name="history_retry">재시도</string>
+    <string name="history_status_success">성공</string>
+    <string name="history_status_failed">실패</string>
+    <string name="history_status_pending">전송 중</string>
+    <string name="history_detail_title">상세</string>
 </resources>

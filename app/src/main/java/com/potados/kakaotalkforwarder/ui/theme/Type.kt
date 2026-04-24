@@ -1,4 +1,4 @@
-package com.example.kakaotalkforwarder.ui.theme
+package com.potados.kakaotalkforwarder.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

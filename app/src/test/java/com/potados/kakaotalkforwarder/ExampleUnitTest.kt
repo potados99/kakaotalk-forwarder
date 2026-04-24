@@ -1,4 +1,4 @@
-package com.example.kakaotalkforwarder
+package com.potados.kakaotalkforwarder
 
 import org.junit.Test
 
